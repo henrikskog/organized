@@ -1,12 +1,17 @@
 # Organized
-Hobby project originally developed to store sheet music. Store data and query for it by tags, its name or any other property. Your entries can be given tags and sorted based on them.
+Store data and query for it by tags, its name or any other property. 
 
-## Technology
+## Tech Stack
 
 ### Frontend
-
-The frontend is built using Nextjs.
+- Web framework: *Next.js*
+- State management: *Recoil.js*
 
 ### Backend
+- Language: *Node.js*
+- Web server api framework: *Express.js*
+- Database: *MySQL*
 
-The backend is an express API using a MYSQL database.
+## Background
+
+A hobby project originally developed to organize sheet music. Became a nice small project to explore web technologies.
