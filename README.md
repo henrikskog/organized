@@ -1,5 +1,6 @@
 # Organized
-Store data and query for it by tags, its name or any other property. 
+
+Store data and query for it by name or tags.
 
 ## Tech Stack
 
@@ -14,4 +15,4 @@ Store data and query for it by tags, its name or any other property.
 
 ## Background
 
-A hobby project originally developed to organize sheet music. Became a nice small project to explore web technologies.
+An overengineered hobby project originally developed to organize sheet music. Has been a nice small project to explore web technologies. 
