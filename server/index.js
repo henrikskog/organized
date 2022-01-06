@@ -1,5 +1,4 @@
 import express from 'express'
-import pool from './db.js'
 import bodyParser from 'body-parser'
 import { newTag, tagsByCategory } from './routes/tags.js'
 import { getCategories, newCategory } from './routes/categories.js'
@@ -10,7 +9,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const app = express()
-const PORT = process.env.DB_PORT
+const PORT = 8000
 
 app.use(bodyParser.json({ extended: true }))
 
