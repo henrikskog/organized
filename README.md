@@ -6,7 +6,6 @@ Store data and query for it by name or tags.
 
 ### Frontend
 - Web framework: *Next.js*
-- State management: *Recoil.js*
 
 ### Backend
 - Language: *Node.js*
