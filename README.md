@@ -15,4 +15,4 @@ Store data and query for it by name or tags.
 
 ## Background
 
-An overengineered hobby project originally developed to organize sheet music. Has been a nice small project to explore web technologies. 
+Hobby project originally developed to organize sheet music. Has turned in to a nice small project to explore web technologies. 
