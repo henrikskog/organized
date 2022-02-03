@@ -2,25 +2,19 @@ import React, { Dispatch, useState } from 'react'
 
 import CreatableSelect from 'react-select/creatable'
 import { ActionMeta, OnChangeValue } from 'react-select'
-import { Option, Tag, TagCategory } from '../../types/types'
-import { Action, ActionKind, TagSelectDataProps } from '../../utils/inputReducer'
-import { newTag } from '../../utils/requests'
+import { Option, Tag, Category } from '../../types/types'
+import { Action, ActionKind, AllTagSelects, TagSelectProps } from '../../utils/inputReducer'
+import { newTag } from '../../utils/strapiRequests'
 
-export interface TagSelectProps {
-  category: TagSelectDataProps
+interface Props {
+  category: TagSelectProps
   className?: string
   dispatch: Dispatch<Action>
-  setRender: (val: boolean) => void
-  render: boolean
 }
 
-const TagSelect = ({
-  render,
-  setRender,
-  className,
-  category: { id, name, options },
-  dispatch,
-}: TagSelectProps) => {
+const TagSelect = ({ className, category: { id, name, options }, dispatch }: Props) => {
+  console.log(options)
+
   const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = (newValue: OnChangeValue<Option, true>, actionMeta: ActionMeta<Option>) => {
@@ -38,6 +32,7 @@ const TagSelect = ({
     dispatch({
       type: ActionKind.SETCHOSEN,
       payload: {
+        categoryId: id,
         category: name,
         newChosen: newVals,
       },
@@ -47,16 +42,17 @@ const TagSelect = ({
   const handleCreate = async (inputValue: string) => {
     setIsLoading(true)
 
-    const insertedId = await newTag(inputValue, id)
+    const response = await newTag(inputValue, id)
+    console.log(response)
 
-    if (insertedId == 0) {
-      console.log('Fetch failed')
+    if (!response.id) {
+      console.log(response)
       return
     }
 
     const newOption: Tag = {
       category_id: id,
-      id: insertedId,
+      id: response.id,
       name: inputValue,
     }
 
@@ -65,6 +61,7 @@ const TagSelect = ({
     dispatch({
       type: ActionKind.ADDOPTION,
       payload: {
+        categoryId: id,
         category: name,
         newOption: newOption,
       },
@@ -73,11 +70,11 @@ const TagSelect = ({
     dispatch({
       type: ActionKind.ADDCHOSEN,
       payload: {
+        categoryId: id,
         category: name,
         newSingleChosen: newOption,
       },
     })
-    setRender(!render)
   }
 
   // anledning, plassering, instrumentering
@@ -93,6 +90,8 @@ const TagSelect = ({
         onCreateOption={handleCreate}
         options={options.map((c) => ({ value: c.id.toString(), label: c.name }))}
         className={className + ' mt-4'}
+        id={`tag-${id.toString()}`}
+        instanceId={`tag-${id.toString()}`}
       />
     </div>
   )

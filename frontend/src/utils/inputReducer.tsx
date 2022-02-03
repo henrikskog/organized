@@ -1,6 +1,10 @@
 import { Tag } from '../types/types'
 
-export interface TagSelectDataProps {
+export interface AllTagSelects {
+  [id: number]: TagSelectProps
+}
+
+export interface TagSelectProps {
   id: number
   name: string
   options: Tag[]
@@ -9,28 +13,28 @@ export interface TagSelectDataProps {
 
 export const LOCALSTORAGEKEY = 'active_categories'
 
-export const initialState: TagSelectDataProps[] = []
+export const initialState: AllTagSelects = {}
 
 // An enum with all the types of actions to use in our reducer
 export enum ActionKind {
-  SETCHOSEN = 'SETCHOSEN',
-  ADDCHOSEN = 'ADDCHOSEN',
-  ADDCATEGORY = 'ADDCATEGORY',
-  SETOPTIONS = 'SETOPTIONS',
-  ADDOPTION = 'ADDOPTION',
-  ADDTAGSELECTS = 'ADDTAGSELECTS',
-  ADDTAGSELECT = 'ADDTAGSELECT',
+  SETCHOSEN,
+  ADDCHOSEN,
+  ADDCATEGORY,
+  SETOPTIONS,
+  ADDOPTION,
+  ADDTAGSELECTS,
+  ADDTAGSELECT,
 }
 
 interface Payload {
-  categoryId?: number
-  category?: string
+  categoryId: number
+  category: string
   newChosen?: Tag[]
   newSingleChosen?: Tag
   newOptions?: Tag[]
   newOption?: Tag
-  newTagSelects?: TagSelectDataProps[]
-  newTagSelect?: TagSelectDataProps
+  newTagSelects?: TagSelectProps[]
+  newTagSelect?: TagSelectProps
 }
 
 // An interface for our actions
@@ -40,52 +44,51 @@ export interface Action {
 }
 
 // Our reducer function that uses a switch statement to handle our actions
-export const reducer = (state: TagSelectDataProps[], action: Action) => {
+export const reducer = (state: AllTagSelects, action: Action) => {
   const { type, payload } = action
-  const { category: name } = payload
+  const { category: name, categoryId: id } = payload
 
   switch (type) {
     case ActionKind.SETCHOSEN:
-      state.forEach((cat) => {
-        if (cat.name == name && payload.newChosen) cat.chosen = payload.newChosen
-      })
+      if (!payload.newChosen) throw new Error('Payload and Action Kind does not match')
+      state[id].chosen = payload.newChosen
       break
     case ActionKind.SETOPTIONS:
-      state.forEach((cat) => {
-        if (cat.name == name && payload.newOptions) cat.options = payload.newOptions
-      })
+      if (!payload.newOptions) throw new Error('Payload and Action Kind does not match')
+      state[id].options = payload.newOptions
       break
     case ActionKind.ADDCHOSEN:
-      state.forEach((cat) => {
-        if (cat.name == name && payload.newSingleChosen) cat.chosen.push(payload.newSingleChosen)
-      })
+      if (!payload.newSingleChosen) throw new Error('Payload and Action Kind does not match')
+      state[id].chosen.push(payload.newSingleChosen)
       break
     case ActionKind.ADDOPTION:
-      state.forEach((cat) => {
-        if (cat.name == name && payload.newOption) cat.options.push(payload.newOption)
-      })
+      if (!payload.newOption || !state[id]) throw new Error('Payload and Action Kind does not match')
+      state[id].options.push(payload.newOption)
       break
     case ActionKind.ADDCATEGORY:
-      if (!payload.categoryId || !payload.category) return state
-      state.push({
-        id: payload.categoryId,
+      state[id] = {
         chosen: [],
         name: payload.category,
         options: [],
-      })
+        id: id,
+      }
       break
     case ActionKind.ADDTAGSELECT:
-      if (!payload.newTagSelect) return state
-      state.push(payload.newTagSelect)
+      if (!payload.newTagSelect) throw new Error('Payload and Action Kind does not match')
+      state[id] = payload.newTagSelect
       break
     case ActionKind.ADDTAGSELECTS:
-      if (!payload.newTagSelects) return state
-      state = [...state, ...payload.newTagSelects]
+      console.log(payload)
+
+      if (!payload.newTagSelects) throw new Error('Payload and Action Kind does not match')
+      payload.newTagSelects.forEach((ts) => {
+        state[ts.id] = { name: ts.name, chosen: ts.chosen, options: ts.options, id: id }
+      })
       break
     default:
-      return state
+      throw new Error(`Unknown action type: ${action.type}`)
   }
 
   localStorage.setItem(LOCALSTORAGEKEY, JSON.stringify(state))
-  return state
+  return JSON.parse(JSON.stringify(state)) as AllTagSelects
 }

@@ -4,9 +4,6 @@ import { newTag, tagsByCategory } from './routes/tags.js'
 import { getCategories, newCategory } from './routes/categories.js'
 import { getNotes, newNote } from './routes/notes.js'
 import cors from 'cors'
-import dotenv from 'dotenv'
-
-dotenv.config()
 
 const app = express()
 const PORT = 8000

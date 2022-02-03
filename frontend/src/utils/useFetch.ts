@@ -7,7 +7,6 @@ export default function useFetch<T>(url: string) {
 
   useEffect(() => {
     setLoading(true)
-    console.log(url)
 
     fetch(url)
       .then((res) => res.json())

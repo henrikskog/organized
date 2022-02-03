@@ -1,0 +1,32 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  shadowDatabaseUrl    = env("SHADOW_URL")
+  url                  = env("DEV_URL")
+  referentialIntegrity = "prisma"
+}
+
+model Item {
+  id         Int    @id @default(autoincrement())
+  name       String @db.VarChar(255)
+  org_number Int?   @unique(map: "unique_org_number")
+  tags       Tag[]
+}
+
+model Tag {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(255)
+  category   Category @relation(references: [id], fields: [categoryId])
+  items      Item[]
+  categoryId Int
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(255)
+  tags Tag[]
+}

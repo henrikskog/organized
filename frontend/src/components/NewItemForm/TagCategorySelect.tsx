@@ -1,17 +1,15 @@
 import React, { Dispatch, useState } from 'react'
 import { ActionMeta, OnChangeValue } from 'react-select'
 import CreatableSelect from 'react-select/creatable'
-import { Tag, TagCategory } from '../../types/types'
-import { Action, ActionKind, TagSelectDataProps } from '../../utils/inputReducer'
-import { getTags, newCategory } from '../../utils/requests'
+import { Tag, Category } from '../../types/types'
+import { Action, ActionKind, TagSelectProps } from '../../utils/inputReducer'
+import { getTags, storeCategory } from '../../utils/strapiRequests'
 import useFetch from '../../utils/useFetch'
 
 interface Props {
   className: string
   dispatch: Dispatch<Action>
-  setRender: (val: boolean) => void
-  render: boolean
-  activeCategories: TagCategory[]
+  activeCategories: Category[]
 }
 
 interface Option {
@@ -19,11 +17,13 @@ interface Option {
   value: string
 }
 
-const addShownTagInput = async (category: TagCategory) => {
-  const promises = await getTags(category.id)
-  const tags = await Promise.all(promises)
+const addShownTagInput = async (category: Category) => {
+  const tags = await getTags(category.id)
 
-  const tagInput: TagSelectDataProps = {
+  // const tags = await Promise.all(promises)
+  console.log(tags)
+
+  const tagInput: TagSelectProps = {
     id: category.id,
     name: category.name,
     chosen: [],
@@ -33,7 +33,7 @@ const addShownTagInput = async (category: TagCategory) => {
   return tagInput
 }
 
-const TagCategorySelect = ({ render, setRender, className, dispatch, activeCategories }: Props) => {
+const CategorySelect = ({ className, dispatch, activeCategories }: Props) => {
   const [createLoading, setCreateLoading] = useState<boolean>(false)
 
   const {
@@ -41,7 +41,7 @@ const TagCategorySelect = ({ render, setRender, className, dispatch, activeCateg
     error,
     loading,
     setData: setCats,
-  } = useFetch<TagCategory[]>('http://localhost:8000/categories')
+  } = useFetch<Category[]>('http://localhost:1337/api/categories')
 
   const getNoneActiveCategories = () => {
     const activeIds = activeCategories.map((cat) => cat.id)
@@ -53,7 +53,7 @@ const TagCategorySelect = ({ render, setRender, className, dispatch, activeCateg
 
     setCreateLoading(true)
     if (!newValue) return
-    const val: TagCategory = { name: newValue.label, id: Number(newValue.value) }
+    const val: Category = { name: newValue.label, id: Number(newValue.value) }
 
     const tagSelect = await addShownTagInput(val)
 
@@ -62,16 +62,15 @@ const TagCategorySelect = ({ render, setRender, className, dispatch, activeCateg
     setCreateLoading(false)
     dispatch({
       type: ActionKind.ADDTAGSELECT,
-      payload: { newTagSelect: tagSelect },
+      payload: { newTagSelect: tagSelect, category: tagSelect.name, categoryId: tagSelect.id },
     })
-    setRender(!render)
   }
 
   const handleCreate = async (inputValue: string) => {
     setCreateLoading(true)
-    const insertId = await newCategory(inputValue)
+    const insertId = await storeCategory(inputValue)
 
-    const val: TagCategory = { name: inputValue, id: insertId }
+    const val: Category = { name: inputValue, id: insertId }
 
     setCreateLoading(false)
 
@@ -79,9 +78,8 @@ const TagCategorySelect = ({ render, setRender, className, dispatch, activeCateg
 
     dispatch({
       type: ActionKind.ADDTAGSELECT,
-      payload: { newTagSelect: tagSelect },
+      payload: { newTagSelect: tagSelect, category: tagSelect.name, categoryId: tagSelect.id },
     })
-    setRender(!render)
   }
 
   // anledning, plassering, instrumentering
@@ -102,4 +100,4 @@ const TagCategorySelect = ({ render, setRender, className, dispatch, activeCateg
   )
 }
 
-export default TagCategorySelect
+export default CategorySelect

@@ -66,7 +66,7 @@ const List = ({ items }: Props) => {
                   </thead>
                   <tbody className="text-sm divide-y divide-gray-100">
                     {shownData.map((item, i) => (
-                      <ListItem key={i} number={item.org_number || 0} name={item.name} />
+                      <ListItem key={i} number={i} name={item.name} />
                     ))}
                   </tbody>
                 </table>

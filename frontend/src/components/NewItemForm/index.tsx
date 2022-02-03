@@ -1,8 +1,16 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
-import { ActionKind, initialState, LOCALSTORAGEKEY, reducer } from '../../utils/inputReducer'
-import { DBItem, storeItem } from '../../utils/requests'
+import { getErrorMessage } from '../../backend/prisma/utils/getErrorMessage'
+import {
+  ActionKind,
+  initialState,
+  LOCALSTORAGEKEY,
+  TagSelectProps,
+  reducer,
+  AllTagSelects,
+} from '../../utils/inputReducer'
+import { DBItem, storeItem } from '../../utils/strapiRequests'
 import { getStorageValue } from '../../utils/useLocalStorage'
-import TagCategorySelect from './TagCategorySelect'
+import CategorySelect from './CategorySelect'
 import TagSelect from './TagSelect'
 
 const BTN =
@@ -14,7 +22,6 @@ const NewItemForm = () => {
   const nameRef = useRef<HTMLInputElement>(null)
   const numberRef = useRef<HTMLInputElement>(null)
   const [state, dispatch] = useReducer(reducer, initialState)
-  const [render, setRender] = useState<boolean>(false)
 
   const onSubmit = async () => {
     // Add a new document with a generated id.
@@ -30,34 +37,42 @@ const NewItemForm = () => {
 
     const tags: number[] = []
 
-    state.forEach((inp) => {
+    Object.values(state).forEach((inp: TagSelectProps) => {
       inp.chosen.forEach((tag) => tags.push(tag.id))
     })
 
     const storedObject: DBItem = {
       name: name,
-      org_number: Number(number),
       tags: tags,
     }
 
-    await storeItem(storedObject)
+    console.log('object: ', storedObject)
+
+    const { data, error } = await storeItem(storedObject)
+    console.log(data)
+    console.log(error)
   }
 
   useEffect(() => {
     if (typeof window != 'undefined') {
-      const localStorageItems = getStorageValue(LOCALSTORAGEKEY, [])
+      const localStorageItems: AllTagSelects = getStorageValue(LOCALSTORAGEKEY, [])
+      console.log(localStorageItems)
 
-      dispatch({
-        type: ActionKind.ADDTAGSELECTS,
-        payload: {
-          newTagSelects: localStorageItems,
-        },
-      })
-      setRender(!render)
+      if (Object.keys(localStorageItems).length) {
+        Object.values(localStorageItems).forEach((cat: TagSelectProps) => {
+          dispatch({
+            type: ActionKind.ADDTAGSELECT,
+            payload: {
+              // category and cat id not needed in this action but made mandatory to simplify reducer function
+              newTagSelect: cat,
+              categoryId: cat.id,
+              category: cat.name,
+            },
+          })
+        })
+      }
     }
   }, [])
-
-  useEffect(() => {}, [state])
 
   return (
     <>
@@ -72,15 +87,9 @@ const NewItemForm = () => {
           <input ref={numberRef} type="number" className={INP} />
         </div>
         <h2 className="text-3xl my-8">Tags</h2>
-        {state.length ? (
-          state.map((category, i) => (
-            <TagSelect
-              render={render}
-              setRender={setRender}
-              key={i}
-              category={category}
-              dispatch={dispatch}
-            />
+        {Object.keys(state).length ? (
+          Object.values(state).map((category, i) => (
+            <TagSelect key={i} category={category} dispatch={dispatch} />
           ))
         ) : (
           <div className="text-gray-400">No chosen categories</div>
@@ -89,13 +98,7 @@ const NewItemForm = () => {
 
         <div className="flex flex-col mt-4">
           <label className="font-semibold leading-none">New tag category</label>
-          <TagCategorySelect
-            render={render}
-            setRender={setRender}
-            dispatch={dispatch}
-            className="mt-4"
-            activeCategories={state}
-          />
+          <CategorySelect dispatch={dispatch} className="mt-4" activeCategories={Object.values(state)} />
         </div>
         <div className="flex items-center justify-center w-full">
           <button

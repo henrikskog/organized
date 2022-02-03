@@ -6,7 +6,6 @@ interface Option {
 interface Item {
   id: number
   name: string
-  org_number?: number
 }
 
 interface Tag {
@@ -15,9 +14,9 @@ interface Tag {
   category_id: number
 }
 
-interface TagCategory {
+interface Category {
   id: number
   name: string
 }
 
-export type { Option, TagCategory, Item, Tag }
+export type { Option, Category, Item, Tag }
