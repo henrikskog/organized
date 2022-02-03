@@ -2,12 +2,19 @@ import React, { ReactElement } from 'react'
 import { Item } from '../types/types'
 import List from '../components/List'
 import Navbar from '../components/Navbar'
-import { createItem, fetchCategories, fetchItems, fetchTagsWithCategory } from '../utils/strapiRequests'
+import {
+  createItem,
+  fetchCategories,
+  fetchItems,
+  fetchTagsWithCategory,
+  wasSuccess,
+} from '../utils/strapiRequests'
 import { getErrorMessage } from '../backend/prisma/utils/getErrorMessage'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
 interface Props {
   items: Item[]
-  error: string | null
+  error?: string
 }
 
 const test = async () => {
@@ -19,38 +26,35 @@ const test = async () => {
   }
 }
 
-const Read = (): ReactElement => <button onClick={test}>klikk meg pls</button>
+// const Read = (): ReactElement => <button onClick={test}>klikk meg pls</button>
 
-// export function Read({ items, error }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-//   return (
-//     <div>
-//       <button onClick={test}>klikk meg pls</button>
-//       <Navbar />
-//       <List items={items.map((i) => ({ id: i.id, name: i.name }))} />
-//       {error && <div>{error}</div>}
-//     </div>
-//   )
-// }
+export function Read({ items, error }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+  {
+    console.log(items)
+  }
+  return (
+    <div>
+      {error ? (
+        <>
+          <Navbar />
+          <List items={items} />
+        </>
+      ) : null}
+      {/* TODO: ERROR COMPONENT / SOMETHING SHOULD RENDER EVEN ON ERROR */}
+    </div>
+  )
+}
 
-// export const getServerSideProps: GetServerSideProps<Props> = async () => {
-//   console.log('on serverside')
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const { data, error } = await fetchItems()
+  console.log(data, error)
 
-//   let result: Item[] = []
-//   let error: string = ''
-//   try {
-//     result = await fetchItems()
-//     console.log('TRYIIING')
-//   } catch (error) {
-//     error = getErrorMessage(error)
-//     console.log('in error', error)
-//   }
-
-//   return {
-//     props: {
-//       items: result,
-//       error: error,
-//     },
-//   }
-// }
+  return {
+    props: {
+      items: data || [],
+      error,
+    },
+  }
+}
 
 export default Read

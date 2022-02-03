@@ -13,7 +13,7 @@ import { get, post } from './requests'
 import { getErrorMessage } from '../backend/prisma/utils/getErrorMessage'
 
 // helper function to tell typescript if data should be defined or not
-export const wasSuccess = <T>(data: T, error: string): data is T => {
+export const wasSuccess = <T>(data: T, error?: string): data is T => {
   return !error
 }
 
