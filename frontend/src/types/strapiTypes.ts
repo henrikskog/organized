@@ -1,7 +1,7 @@
 export interface StrapiResponse<T> {
   data: T | null
   // only returning error message from fetching functions, so error is only a string
-  error: string | null
+  error?: string
 }
 
 interface DataAttributes {

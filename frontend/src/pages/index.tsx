@@ -2,7 +2,6 @@ import React, { ReactElement } from 'react'
 import { Item } from '../types/types'
 import List from '../components/List'
 import Navbar from '../components/Navbar'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { createItem, fetchCategories, fetchItems, fetchTagsWithCategory } from '../utils/strapiRequests'
 import { getErrorMessage } from '../backend/prisma/utils/getErrorMessage'
 

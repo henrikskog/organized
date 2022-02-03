@@ -17,6 +17,11 @@ export const wasSuccess = <T>(data: T, error: string): data is T => {
   return !error
 }
 
+const extractReturnValue = <T>(returnValues: StrapiResponse<T>): StrapiResponse<T> => {
+  if (!returnValues.error && returnValues.data) return { data: returnValues.data }
+  else return returnValues
+}
+
 /* ITEM TABLE */
 export const fetchItems = async (): Promise<StrapiResponse<Item[]>> => {
   let returnValues = {} as StrapiResponse<Item[]>
@@ -34,7 +39,7 @@ export const fetchItems = async (): Promise<StrapiResponse<Item[]>> => {
     returnValues.error = getErrorMessage(error)
   }
 
-  return { data: returnValues.data, error: returnValues.error }
+  return extractReturnValue(returnValues)
 }
 
 export const createItem = async (name: string): Promise<StrapiResponse<Item>> => {
@@ -61,7 +66,7 @@ export const createItem = async (name: string): Promise<StrapiResponse<Item>> =>
     returnValue.error = getErrorMessage(error)
   }
 
-  return { error: returnValue.error, data: returnValue.data }
+  return extractReturnValue(returnValue)
 }
 
 /* CATEGORY TABLE */
@@ -81,7 +86,7 @@ export const fetchCategories = async (): Promise<StrapiResponse<Category[]>> => 
     returnValues.error = getErrorMessage(error)
   }
 
-  return { data: returnValues.data, error: returnValues.error }
+  return extractReturnValue(returnValues)
 }
 
 export const createCategory = async (name: string): Promise<StrapiResponse<Category>> => {
@@ -108,7 +113,7 @@ export const createCategory = async (name: string): Promise<StrapiResponse<Categ
     returnValue.error = getErrorMessage(error)
   }
 
-  return { error: returnValue.error, data: returnValue.data }
+  return extractReturnValue(returnValue)
 }
 
 /* TAG TABLE */
@@ -148,7 +153,7 @@ export const fetchTagsWithCategory = async (categoryId: number): Promise<StrapiR
     returnValues.error = getErrorMessage(error)
   }
 
-  return { data: returnValues.data, error: returnValues.error }
+  return extractReturnValue(returnValues)
 }
 
 export const createTag = async (name: string, categoryID: string): Promise<StrapiResponse<Category>> => {
@@ -178,5 +183,5 @@ export const createTag = async (name: string, categoryID: string): Promise<Strap
     returnValue.error = getErrorMessage(error)
   }
 
-  return { error: returnValue.error, data: returnValue.data }
+  return extractReturnValue(returnValue)
 }
