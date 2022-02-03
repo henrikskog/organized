@@ -1,11 +1,11 @@
 # Organized
-Store data and query for it by tags, its name or any other property. 
+
+Store data and query for it by name or tags.
 
 ## Tech Stack
 
 ### Frontend
 - Web framework: *Next.js*
-- State management: *Recoil.js*
 
 ### Backend
 - Language: *Node.js*
@@ -14,4 +14,4 @@ Store data and query for it by tags, its name or any other property.
 
 ## Background
 
-A hobby project originally developed to organize sheet music. Became a nice small project to explore web technologies.
+Hobby project originally developed to organize sheet music. Has turned in to a nice small project to explore web technologies. 
