@@ -6,6 +6,11 @@ Store data and query for it by name or tags.
 
 - Query by tags
 
+## TODO
+
+- Support local usage
+- Test
+
 ## Tech Stack
 
 ### Frontend
