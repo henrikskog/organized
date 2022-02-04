@@ -13,7 +13,7 @@ import { get, post } from './requests'
 import { getErrorMessage } from '../backend/prisma/utils/getErrorMessage'
 
 // helper function to tell typescript if data should be defined or not
-export const wasSuccess = <T>(data: T, error?: string): data is T => {
+export const wasSuccess = <T>(data: T, error?: string): data is NonNullable<T> => {
   return !error
 }
 
@@ -42,7 +42,7 @@ export const fetchItems = async (): Promise<StrapiResponse<Item[]>> => {
   return extractReturnValue(returnValues)
 }
 
-export const createItem = async (name: string): Promise<StrapiResponse<Item>> => {
+export const createItem = async (name: string, tags?: number[]): Promise<StrapiResponse<Item>> => {
   let returnValue = {} as StrapiResponse<Item>
 
   try {
@@ -51,6 +51,7 @@ export const createItem = async (name: string): Promise<StrapiResponse<Item>> =>
       JSON.stringify({
         data: {
           name: name,
+          tags: tags || [],
         },
       })
     )
