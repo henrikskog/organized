@@ -4,7 +4,7 @@ import CreatableSelect from 'react-select/creatable'
 import { ActionMeta, OnChangeValue } from 'react-select'
 import { Option, Tag, Category } from '../../types/types'
 import { Action, ActionKind, AllTagSelects, TagSelectProps } from '../../utils/inputReducer'
-import { newTag } from '../../utils/strapiRequests'
+import { createTag, wasSuccess } from '../../utils/strapiRequests'
 
 interface Props {
   category: TagSelectProps
@@ -42,17 +42,17 @@ const TagSelect = ({ className, category: { id, name, options }, dispatch }: Pro
   const handleCreate = async (inputValue: string) => {
     setIsLoading(true)
 
-    const response = await newTag(inputValue, id)
-    console.log(response)
+    const { data, error } = await createTag(inputValue, id)
+    console.log(data, error)
 
-    if (!response.id) {
-      console.log(response)
+    if (!wasSuccess(data, error)) {
+      console.log(error)
       return
     }
 
     const newOption: Tag = {
       category_id: id,
-      id: response.id,
+      id: data.id,
       name: inputValue,
     }
 

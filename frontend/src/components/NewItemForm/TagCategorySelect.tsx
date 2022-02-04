@@ -1,9 +1,15 @@
-import React, { Dispatch, useState } from 'react'
+import { setDefaultResultOrder } from 'dns'
+import React, { Dispatch, useEffect, useState } from 'react'
 import { ActionMeta, OnChangeValue } from 'react-select'
 import CreatableSelect from 'react-select/creatable'
-import { Tag, Category } from '../../types/types'
+import { Category } from '../../types/types'
 import { Action, ActionKind, TagSelectProps } from '../../utils/inputReducer'
-import { getTags, storeCategory } from '../../utils/strapiRequests'
+import {
+  createCategory,
+  fetchCategories,
+  fetchTagsWithCategory,
+  wasSuccess,
+} from '../../utils/strapiRequests'
 import useFetch from '../../utils/useFetch'
 
 interface Props {
@@ -18,30 +24,36 @@ interface Option {
 }
 
 const addShownTagInput = async (category: Category) => {
-  const tags = await getTags(category.id)
-
-  // const tags = await Promise.all(promises)
-  console.log(tags)
+  const { data, error } = await fetchTagsWithCategory(category.id)
+  if (!wasSuccess(data)) {
+    console.error('Error: ' + error, 'exiting function')
+    /* TODO: error should be exposed to user */
+    return
+  }
 
   const tagInput: TagSelectProps = {
     id: category.id,
     name: category.name,
     chosen: [],
-    options: tags,
+    options: data,
   }
 
   return tagInput
 }
 
-const CategorySelect = ({ className, dispatch, activeCategories }: Props) => {
+const TagCategorySelect = ({ className, dispatch, activeCategories }: Props) => {
+  useEffect(() => {
+    ;(async () => {
+      const { data, error } = await fetchCategories()
+      if (wasSuccess(data, error)) setData(data)
+      else {
+        setError(error)
+      }
+    })()
+  }, [])
   const [createLoading, setCreateLoading] = useState<boolean>(false)
-
-  const {
-    data,
-    error,
-    loading,
-    setData: setCats,
-  } = useFetch<Category[]>('http://localhost:1337/api/categories')
+  const [data, setData] = useState<Category[]>([])
+  const [error, setError] = useState<string>()
 
   const getNoneActiveCategories = () => {
     const activeIds = activeCategories.map((cat) => cat.id)
@@ -57,20 +69,22 @@ const CategorySelect = ({ className, dispatch, activeCategories }: Props) => {
 
     const tagSelect = await addShownTagInput(val)
 
-    console.log(tagSelect)
-
     setCreateLoading(false)
     dispatch({
       type: ActionKind.ADDTAGSELECT,
-      payload: { newTagSelect: tagSelect, category: tagSelect.name, categoryId: tagSelect.id },
+      payload: { newTagSelect: tagSelect, category: tagSelect!.name, categoryId: tagSelect!.id },
+      /* ^ TODO: errors are not being handled in .name, .id from addShownTagInput func */
     })
   }
 
   const handleCreate = async (inputValue: string) => {
     setCreateLoading(true)
-    const insertId = await storeCategory(inputValue)
+    const { data, error } = await createCategory(inputValue)
 
-    const val: Category = { name: inputValue, id: insertId }
+    if (!wasSuccess(data, error)) return
+    /* TODO: handle database failure ^ */
+
+    const val: Category = { name: inputValue, id: data.id }
 
     setCreateLoading(false)
 
@@ -78,7 +92,8 @@ const CategorySelect = ({ className, dispatch, activeCategories }: Props) => {
 
     dispatch({
       type: ActionKind.ADDTAGSELECT,
-      payload: { newTagSelect: tagSelect, category: tagSelect.name, categoryId: tagSelect.id },
+      payload: { newTagSelect: tagSelect, category: tagSelect!.name, categoryId: tagSelect!.id },
+      /* ^ TODO: errors are not being handled in .name, .id from addShownTagInput func */
     })
   }
 
@@ -88,8 +103,8 @@ const CategorySelect = ({ className, dispatch, activeCategories }: Props) => {
       id="select-id"
       instanceId="select-id-category"
       isClearable
-      isDisabled={loading || createLoading}
-      isLoading={loading || createLoading}
+      // isDisabled={loading || createLoading}
+      // isLoading={loading || createLoading}
       onChange={handleChange}
       onCreateOption={handleCreate}
       options={
@@ -100,4 +115,4 @@ const CategorySelect = ({ className, dispatch, activeCategories }: Props) => {
   )
 }
 
-export default CategorySelect
+export default TagCategorySelect

@@ -1,60 +1,42 @@
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useEffect, useState } from 'react'
 import { Item } from '../types/types'
 import List from '../components/List'
 import Navbar from '../components/Navbar'
-import {
-  createItem,
-  fetchCategories,
-  fetchItems,
-  fetchTagsWithCategory,
-  wasSuccess,
-} from '../utils/strapiRequests'
-import { getErrorMessage } from '../backend/prisma/utils/getErrorMessage'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { fetchItems, wasSuccess } from '../utils/strapiRequests'
 
 interface Props {
   items: Item[]
   error?: string
 }
 
-const test = async () => {
-  try {
-    const t = await fetchItems()
-    console.log(t)
-  } catch (error) {
-    console.log(getErrorMessage(error))
-  }
-}
-
-// const Read = (): ReactElement => <button onClick={test}>klikk meg pls</button>
-
-export function Read({ items, error }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-  {
-    console.log(items)
-  }
+export function Read(): ReactElement {
+  const [items, setItems] = useState<Item[]>([])
+  const [error, setError] = useState<string>()
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data, error: e } = await fetchItems()
+      if (wasSuccess(data, e)) setItems(data)
+      else {
+        setError(e)
+      }
+    }
+    fetchData()
+  }, [])
   return (
     <div>
-      {error ? (
+      {!error ? (
         <>
           <Navbar />
           <List items={items} />
         </>
-      ) : null}
-      {/* TODO: ERROR COMPONENT / SOMETHING SHOULD RENDER EVEN ON ERROR */}
+      ) : (
+        <div>ERROR: {error}</div>
+      )}
+      {/* TODO: error component / something should render even on error */}
     </div>
   )
 }
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const { data, error } = await fetchItems()
-  console.log(data, error)
-
-  return {
-    props: {
-      items: data || [],
-      error,
-    },
-  }
-}
+/* SERVERSIDEPROPS has conflict with local host, see commit: abf6d348891bb0c47ac2bedecfcdd3219f0e3963 for conflicting implementation */
 
 export default Read

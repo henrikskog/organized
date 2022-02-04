@@ -8,9 +8,9 @@ import {
   reducer,
   AllTagSelects,
 } from '../../utils/inputReducer'
-import { DBItem, storeItem } from '../../utils/strapiRequests'
+import { createItem } from '../../utils/strapiRequests'
 import { getStorageValue } from '../../utils/useLocalStorage'
-import CategorySelect from './CategorySelect'
+import TagCategorySelect from './TagCategorySelect'
 import TagSelect from './TagSelect'
 
 const BTN =
@@ -30,7 +30,6 @@ const NewItemForm = () => {
     }
 
     const name = nameRef.current.value
-    const number = numberRef.current.value
 
     nameRef.current.value = ''
     numberRef.current.value = ''
@@ -41,14 +40,8 @@ const NewItemForm = () => {
       inp.chosen.forEach((tag) => tags.push(tag.id))
     })
 
-    const storedObject: DBItem = {
-      name: name,
-      tags: tags,
-    }
+    const { data, error } = await createItem(name, tags)
 
-    console.log('object: ', storedObject)
-
-    const { data, error } = await storeItem(storedObject)
     console.log(data)
     console.log(error)
   }
@@ -98,7 +91,7 @@ const NewItemForm = () => {
 
         <div className="flex flex-col mt-4">
           <label className="font-semibold leading-none">New tag category</label>
-          <CategorySelect dispatch={dispatch} className="mt-4" activeCategories={Object.values(state)} />
+          <TagCategorySelect dispatch={dispatch} className="mt-4" activeCategories={Object.values(state)} />
         </div>
         <div className="flex items-center justify-center w-full">
           <button

@@ -157,12 +157,12 @@ export const fetchTagsWithCategory = async (categoryId: number): Promise<StrapiR
   return extractReturnValue(returnValues)
 }
 
-export const createTag = async (name: string, categoryID: string): Promise<StrapiResponse<Category>> => {
+export const createTag = async (name: string, categoryID: number): Promise<StrapiResponse<Category>> => {
   let returnValue = {} as StrapiResponse<Category>
 
   try {
     const response = await post<string, TagResponse>(
-      '/api/tags',
+      '/api/tags?populate=category',
       JSON.stringify({
         data: {
           name: name,
