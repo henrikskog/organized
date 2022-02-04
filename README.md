@@ -13,7 +13,7 @@ Hobby project originally developed to organize stuff by a a variable amount of c
 
 ### Backend
 - Language: *Node.js*
-- Web server api framework: (Strapi)[https://strapi.io/]
+- Web server api framework: [Strapi](https://strapi.io/)
 - Database: *SQLite*
 
 ## Not yet implemented
