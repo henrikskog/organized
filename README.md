@@ -1,6 +1,10 @@
 # Organized
 
-Store data and query for it by name or tags.
+Store data and query for it by name or tags. 
+
+## Current state
+
+Filtering not implemented
 
 ## Tech Stack
 
